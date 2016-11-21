@@ -1,0 +1,8 @@
+name "octod"
+description "D library for interacting with GitHub API"
+authors "Mihails Strasuns"
+copyright "Copyright 2016, Sociomantic Labs"
+license "Boost"
+
+targetType "sourceLibrary"
+dependency "vibe-d:http" version="0.7.30"
