@@ -172,6 +172,9 @@ struct HTTPConnection
 
         logInfo("GET %s", url);
 
+        if (this.config.dryRun)
+            return Json.emptyObject;
+
         // initialize result as array - if actual response isn't array, it
         // will be overwritten by assignement anyway, otherwise it allows
         // easy concatenation of multi-page results
@@ -243,6 +246,9 @@ struct HTTPConnection
 
         logInfo("POST %s", url);
 
+        if (this.config.dryRun)
+            return Json.emptyObject;
+
         auto response = this.connection.request(
             (scope request) {
                 request.requestURL = url;
@@ -272,6 +278,9 @@ struct HTTPConnection
         assert (this.connection !is null);
 
         logInfo("PATCH %s", url);
+
+        if (this.config.dryRun)
+            return Json.emptyObject;
 
         auto response = this.connection.request(
             (scope request) {
