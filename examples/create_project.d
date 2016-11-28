@@ -8,7 +8,6 @@ license "Boost"
 
 targetType "executable"
 dependency "octod" version="*" path="../"
-dependency "vibe-d:http" version="0.7.30"
 +/
 
 import octod;
