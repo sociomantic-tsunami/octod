@@ -16,6 +16,19 @@ import octod.core;
 import octod.api.common;
 
 /**
+    Aggregate for git tag description
+
+    There are quite some places in GitHub JSON responses where tags are
+    referred either by name or by sha exclusively. This API tries to provide
+    both when feasible and wraps it with this struct.
+ **/
+struct Tag
+{
+    string name;
+    string sha;
+}
+
+/**
     Wraps connection and repository metadata for simple shortcut access
     to repository related API methods. Arbitrary fields can be accessed
     via `json` getter.
@@ -40,6 +53,50 @@ struct Repository
     string language ( )
     {
         return this.json["language"].get!string();
+    }
+
+    /**
+        Fetches repository tags filtered to only released ones
+
+        This utility is useful for projects that strictly require all public
+        releases to be actual GitHub releases, making possible to ignore any
+        other tags that may exist in the project.
+
+        There is a GitHub API to get both releases and tags, but former lacks
+        SHA information and latter has no information about releases. This
+        method makes request to both and merges information into one entity.
+
+        Returns:
+            array of tag structs for all GitHub releases in this repo
+     **/
+    Tag[] releasedTags ( )
+    {
+        import std.format;
+        import std.array;
+        import std.algorithm.iteration : map;
+        import std.algorithm.searching : find;
+
+        auto owner = this.json["owner"]["login"].get!string();
+        auto name = this.name();
+
+        auto url = format("/repos/%s/%s/releases", owner, name);
+        auto json_releases = this.connection.get(url).get!(Json[]);
+
+        url = format("/repos/%s/%s/tags", owner, name);
+        auto json_tags = this.connection.get(url).get!(Json[]);
+
+        Tag resolveTag ( Json release )
+        {
+            auto tag_name = release["tag_name"].get!string();
+            auto tag = json_tags
+                .find!(json => json["name"].get!string() == tag_name);
+            assert (!tag.empty);
+            return Tag(tag_name, tag.front["commit"]["sha"].to!string());
+        }
+
+        return json_releases
+            .map!resolveTag
+            .array();
     }
 }
 
