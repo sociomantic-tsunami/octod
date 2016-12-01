@@ -44,6 +44,29 @@ struct Repository
 }
 
 /**
+    Fetch specific repository metadata
+
+    Params:
+        connection = setup connection to API server
+        repo = repository string of form "owner/repo", for example
+            "sociomantic-tsunami/ocean"
+
+    Returns:
+        Wrapper struct to work with that repo embedding the json metadata
+ **/
+Repository repository ( HTTPConnection connection, string repo )
+{
+    import std.format;
+
+    validateRepoString(repo);
+
+    return Repository(
+        connection,
+        connection.get(format("/repos/%s", repo))
+    );
+}
+
+/**
     Lists all repos for given organization
 
     Params:
