@@ -122,7 +122,7 @@ struct HTTPConnection
 
         import std.regex;
 
-        logInfo("Connecting to GitHub API server ...");
+        logTrace("Connecting to GitHub API server ...");
 
         static rgxURL = regex(r"^(\w*)://([^/]+)$");
         auto match = this.config.baseURL.matchFirst(rgxURL);
@@ -153,7 +153,7 @@ struct HTTPConnection
         this.connection = new Connection;
         *this.connection = connectHTTP(addr, port, tls);
 
-        logInfo("Connected.");
+        logTrace("Connected.");
     }
 
     /**
@@ -170,7 +170,7 @@ struct HTTPConnection
     {
         assert (this.connection !is null);
 
-        logInfo("GET %s", url);
+        logTrace("GET %s", url);
 
         if (this.config.dryRun)
             return Json.emptyObject;
@@ -244,7 +244,7 @@ struct HTTPConnection
     {
         assert (this.connection !is null);
 
-        logInfo("POST %s", url);
+        logTrace("POST %s", url);
 
         if (this.config.dryRun)
             return Json.emptyObject;
@@ -277,7 +277,7 @@ struct HTTPConnection
     {
         assert (this.connection !is null);
 
-        logInfo("PATCH %s", url);
+        logTrace("PATCH %s", url);
 
         if (this.config.dryRun)
             return Json.emptyObject;
