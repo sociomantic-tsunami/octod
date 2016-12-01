@@ -66,18 +66,14 @@ mixin template CommonEntityMethods ( )
 
     private
     {
-        Json raw_json;
         HTTPConnection connection;
 
-        this ( HTTPConnection connection, Json raw_json )
+        this ( HTTPConnection connection, const Json json )
         {
-            this.raw_json = raw_json;
+            this.json = json;
             this.connection = connection;
         }
     }
 
-    Json json ( )
-    {
-        return this.raw_json;
-    }
+    const Json json;
 }
