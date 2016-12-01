@@ -16,12 +16,9 @@ import std.algorithm;
 import std.array;
 
 import vibe.data.json;
-import vibe.core.log;
 
 void main ( )
 {
-    setLogLevel(LogLevel.info);
-
     Configuration conf;
     conf.oauthToken = "XXXXXXX";
     conf.accept = "application/vnd.github.inertia-preview+json";
