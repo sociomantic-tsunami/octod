@@ -13,6 +13,7 @@ module octod.api.repos;
 
 import vibe.data.json;
 import octod.core;
+import octod.media;
 import octod.api.common;
 
 /**
@@ -53,6 +54,27 @@ struct Repository
     string language ( )
     {
         return this.json["language"].get!string();
+    }
+
+    /**
+        Makes an API request to resolve specified git reference name to
+        its SHA hash in this repo.
+
+        Params:
+            refname = git ref (like tag or branch) name
+
+        Returns:
+            SHA of commit matching the reference
+     **/
+    string resolveGitReference ( string refname )
+    {
+        import std.format;
+
+        auto owner = this.json["owner"]["login"].get!string();
+        auto name = this.name();
+        auto url = format("/repos/%s/%s/commits/%s", owner, name, refname);
+        auto json = this.connection.get(url, MediaType("", "sha"));
+        return json.get!string();
     }
 
     /**
