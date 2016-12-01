@@ -120,6 +120,208 @@ struct Repository
             .map!resolveTag
             .array();
     }
+
+    /**
+        Provides access to repository content
+
+        Params:
+            path = relative path in the repository to request
+            gitref = branch/tag to use. If empty, default branch will be used.
+
+        Returns:
+            information about found entity (file/directory/submodule/symlink)
+            stored in a wrapper struct
+     **/
+    RepositoryEntity download ( string path, string gitref = "" )
+    {
+        import std.format;
+
+        auto url = format(
+            "/repos/%s/%s/contents/%s",
+            this.json["owner"]["login"].get!string(),
+            this.name(),
+            path
+        );
+
+        if (gitref.length)
+            url ~= "?ref=" ~ gitref;
+
+        return RepositoryEntity(this.connection.get(url));
+    }
+}
+
+/**
+    Struct representing some entity stored in a git repository
+
+    Exact kind of entity can be checked by calling `RepositoryEntity.kind`, and
+    more strongly typed wrapper structs can be retrieved by
+    `RepositoryEntity.expectXXX` methods.
+ **/
+struct RepositoryEntity
+{
+    /**
+        Represents a file stored in the repository
+     **/
+    static struct File
+    {
+        const Json json;
+
+        private this ( Json json )
+        {
+            this.json = json;
+        }
+
+        /**
+            Returns:
+                Decoded content of the file (if < 1Mb)
+         **/
+        immutable(void)[] content ( )
+        {
+            import std.exception : enforce;
+            import std.base64;
+            import std.range : join;
+            import std.algorithm : splitter;
+
+            enforce!HTTPAPIException(
+                this.json["encoding"].get!string()== "base64");
+
+            auto encoded = this.json["content"].get!string();
+            // GitHub provides base64 with newlines injected to enable per-line
+            // decoding, those have to be removed here
+            return Base64.decode(encoded.splitter("\n").join(""));
+        }
+    }
+
+    /**
+        Represents a directory stored in the repository
+     **/
+    static struct Directory
+    {
+        const Json json;
+
+        private this ( Json json )
+        {
+            this.json = json;
+        }
+
+        /**
+            Returns:
+                Array of paths for entities within this directory. Paths are
+                relative to repository root.
+         **/
+        const(string)[] listAll ( )
+        {
+            import std.algorithm.iteration : map;
+            import std.array;
+
+            return this.json
+                .get!(Json[])
+                .map!(element => element["path"].get!string())
+                .array();
+        }
+    }
+
+    /**
+        Represents a submodule linked from the repository
+     **/
+    static struct Submodule
+    {
+        const Json json;
+
+        private this ( Json json )
+        {
+            this.json = json;
+        }
+
+        /**
+            Returns:
+                linked submodule hash
+         **/
+        string sha ( )
+        {
+            return this.json["sha"].get!string();
+        }
+
+        /**
+            Returns:
+                linked submodule git URL
+         **/
+        string url ( )
+        {
+            return this.json["submodule_git_url"].get!string();
+        }
+    }
+
+    /**
+        Raw entity metadata JSON
+
+        See https://developer.github.com/v3/repos/contents/#get-contents for
+        more details
+     **/
+    const Json json;
+
+    /**
+        Returns:
+            typeid of whatever kind of entity stored metadata describes
+     **/
+    TypeInfo kind ( )
+    {
+        if (this.json.type() == Json.Type.Array)
+            return typeid(RepositoryEntity.Directory);
+
+        switch (this.json["type"].get!string())
+        {
+            case "file":
+                return typeid(RepositoryEntity.File);
+            case "submodule":
+                return typeid(RepositoryEntity.Submodule);
+            case "symlink":
+            default:
+                assert(false);
+        }
+    }
+
+    /**
+        Returns:
+            current entity wrapped as RepositoryEntity.File
+
+        Throws:
+            HTTPAPIException on expectation violation
+     **/
+    File expectFile ( )
+    {
+        import std.exception : enforce;
+        enforce!HTTPAPIException(this.kind == typeid(RepositoryEntity.File));
+        return File(json);
+    }
+
+    /**
+        Returns:
+            current entity wrapped as RepositoryEntity.Directory
+
+        Throws:
+            HTTPAPIException on expectation violation
+     **/
+    Directory expectDirectory ( )
+    {
+        import std.exception : enforce;
+        enforce!HTTPAPIException(this.kind == typeid(RepositoryEntity.Directory));
+        return Directory(json);
+    }
+
+    /**
+        Returns:
+            current entity wrapped as RepositoryEntity.Submodule
+
+        Throws:
+            HTTPAPIException on expectation violation
+     **/
+    Submodule expectSubmodule ( )
+    {
+        import std.exception : enforce;
+        enforce!HTTPAPIException(this.kind == typeid(RepositoryEntity.Submodule));
+        return Submodule(json);
+    }
 }
 
 /**
