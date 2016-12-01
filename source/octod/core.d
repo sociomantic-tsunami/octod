@@ -203,6 +203,14 @@ struct HTTPConnection
                 continue;
             }
 
+            // Most responses are JSON, treat all others as plain text and
+            // wrap result into JSON string:
+            if (accept.format == MediaFormat.JSON)
+            {
+                import vibe.stream.operations;
+                return Json(response.bodyReader.readAllUTF8());
+            }
+
             auto json = response.readJson();
             if (json.type == Json.Type.Array)
             {
