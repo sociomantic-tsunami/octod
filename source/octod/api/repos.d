@@ -39,7 +39,11 @@ struct Repository
      **/
     string language ( )
     {
-        return this.json["language"].get!string();
+        auto lang = this.json["language"];
+        if ( lang.type == lang.type.string )
+            return lang.get!string();
+        else
+            return "Not defined";
     }
 }
 
