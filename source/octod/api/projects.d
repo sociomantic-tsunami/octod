@@ -17,9 +17,16 @@
 module octod.api.projects;
 
 import octod.core;
+import octod.media;
 import octod.api.common;
 
 import vibe.data.json;
+
+/**
+    Project API is experimental, thus relevant requests have to use
+    specific media type.
+ **/
+enum ProjectMediaType = "application/vnd.github.inertia-preview+json";
 
 /**
     Lists all projects for given organization
@@ -42,7 +49,7 @@ Project[] listOrganizationProjects ( HTTPConnection connection, string organizat
     import std.format;
 
     auto url = format("/orgs/%s/projects", organization);
-    auto json = connection.get(url);
+    auto json = connection.get(url, ProjectMediaType);
     return json
         .get!(Json[])
         .map!(json => Project(connection, json))
@@ -114,7 +121,7 @@ struct Project
         import std.array : array;
 
         auto url = format("/projects/%s/columns", this.id());
-        auto json = connection.get(url);
+        auto json = connection.get(url, ProjectMediaType);
 
         return json
             .get!(Json[])
@@ -204,7 +211,7 @@ struct Column
         import std.array;
 
         auto url = format("/projects/columns/%s/cards", this.id());
-        auto json = connection.get(url);
+        auto json = connection.get(url, ProjectMediaType);
 
         return json
             .get!(Json[])

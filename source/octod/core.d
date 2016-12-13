@@ -18,6 +18,8 @@ import vibe.http.client;
 import vibe.data.json;
 import vibe.core.log;
 
+import octod.media;
+
 /**
     Configuration required to interact with GitHub API
  **/
@@ -31,8 +33,6 @@ struct Configuration
     string password;
     /// If 'this.username' is empty, will be used as auth token
     string oauthToken;
-    /// Sent as 'Accept' header
-    string accept = "application/vnd.github.v3+json";
     /// By default client works in dry run mode
     bool dryRun = true;
 }
@@ -168,7 +168,7 @@ struct HTTPConnection
             Json body of the response. If response is multi-page, all pages
             are collected and concatenated into one returned json object.
      **/
-    Json get ( string url, string accept = "" )
+    Json get ( string url, MediaType accept )
     {
         assert (this.connection !is null);
 
@@ -192,7 +192,7 @@ struct HTTPConnection
                 (scope request) {
                     request.requestURL = url;
                     request.method = HTTPMethod.GET;
-                    this.prepareRequest(request, accept);
+                    this.prepareRequest(request, accept.toString());
                 }
             );
 
@@ -235,6 +235,15 @@ struct HTTPConnection
         }
 
         return result;
+    }
+
+    /**
+        ditto
+     **/
+    Json get ( string url, string accept = "" )
+    {
+        return this.get(url, accept.length
+            ? MediaType.parse(accept) : MediaType.Default);
     }
 
     /**
@@ -332,7 +341,7 @@ struct HTTPConnection
         if (accept.length)
             request.headers["Accept"] = accept;
         else
-            request.headers["Accept"] = this.config.accept;
+            request.headers["Accept"] = MediaType.Default.toString();
     }
 
     /**

@@ -21,7 +21,6 @@ void main ( )
 {
     Configuration conf;
     conf.oauthToken = "XXXXXXX";
-    conf.accept = "application/vnd.github.inertia-preview+json";
     conf.dryRun = true;
 
     auto client = HTTPConnection.connect(conf);
