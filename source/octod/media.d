@@ -12,6 +12,23 @@
 module octod.media;
 
 /**
+    Enumerates some of commonly used formats
+ **/
+ enum MediaFormat
+ {
+     JSON = "json",
+     XML  = "xml",
+ }
+
+ /**
+    Enumerates known versions
+  **/
+enum ProtocolVersion
+{
+    V3 = "v3",
+}
+
+/**
     Stores sub-parts of media type string as separate fields. Simplifies
     branching based on media types and safeguards against some typos in the
     string.
@@ -32,7 +49,7 @@ struct MediaType
             API version to be used for the request. If empty, GitHub will
             assume whatever default API version currently is.
          **/
-        string ver           = "v3";
+        string ver           = ProtocolVersion.V3;
         /**
             Custom parameters, usually indicate kind of content to serve
             (for example, rendered markdown or raw source)
@@ -41,7 +58,7 @@ struct MediaType
         /**
             Format of response data, usually "json" or "xml"
          **/
-        string format        = "json";
+        string format        = MediaFormat.JSON;
     }
 
     /**
