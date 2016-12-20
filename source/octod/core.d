@@ -298,6 +298,14 @@ struct HTTPConnection
         return response.readJson();
     }
 
+    /**
+        Common request setup code shared by all request kinds
+
+        Params:
+            request = vibe.d request object to prepare
+            accept = optional argument with custom `Accept` header to
+                specify for this one request
+     **/
     private void prepareRequest ( scope HTTPClientRequest request,
         string accept = "" )
     {
@@ -314,6 +322,12 @@ struct HTTPConnection
             request.headers["Accept"] = this.config.accept;
     }
 
+    /**
+        Ensures that HTTP response succeeded
+
+        Params:
+            response = vibe.d response object that needs to be checked
+     **/
     private void handleResponseStatus ( scope HTTPClientResponse response )
     {
         import std.format;
