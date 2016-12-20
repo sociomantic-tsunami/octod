@@ -104,8 +104,11 @@ struct HTTPConnection
     {
         import std.string : startsWith;
 
-        if (!config.oauthToken.startsWith("bearer "))
-            config.oauthToken = "bearer " ~ config.oauthToken;
+        if (config.oauthToken.length > 0)
+        {
+            if (!config.oauthToken.startsWith("bearer "))
+                config.oauthToken = "bearer " ~ config.oauthToken;
+        }
 
         this.config = config;
     }
@@ -343,7 +346,7 @@ struct HTTPConnection
 
         if (this.config.username.length > 0)
             request.addBasicAuth(this.config.username, this.config.password);
-        else
+        else if (this.config.oauthToken.length > 0)
             request.headers["Authorization"] = this.config.oauthToken;
 
         if (accept.length)
