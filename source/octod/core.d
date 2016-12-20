@@ -196,7 +196,12 @@ struct HTTPConnection
                 }
             );
 
-            this.handleResponseStatus(response);
+            if (auto location = this.handleResponseStatus(response))
+            {
+                url = location;
+                response.dropBody();
+                continue;
+            }
 
             auto json = response.readJson();
             if (json.type == Json.Type.Array)
@@ -260,7 +265,11 @@ struct HTTPConnection
             }
         );
 
-        this.handleResponseStatus(response);
+        if (auto location = this.handleResponseStatus(response))
+        {
+            response.dropBody();
+            return this.post(location, json);
+        }
 
         return response.readJson();
     }
@@ -293,7 +302,11 @@ struct HTTPConnection
             }
         );
 
-        this.handleResponseStatus(response);
+        if (auto location = this.handleResponseStatus(response))
+        {
+            response.dropBody();
+            return this.patch(location, json);
+        }
 
         return response.readJson();
     }
@@ -327,8 +340,11 @@ struct HTTPConnection
 
         Params:
             response = vibe.d response object that needs to be checked
+
+        Returns:
+            new URL string in case of redirect, null otherwise
      **/
-    private void handleResponseStatus ( scope HTTPClientResponse response )
+    private string handleResponseStatus ( scope HTTPClientResponse response )
     {
         import std.format;
         import vibe.http.status;
@@ -338,9 +354,14 @@ struct HTTPConnection
         if (status == HTTPStatus.notFound)
             throw new HTTPAPIException("Requested non-existent API URL");
 
+        if (status == HTTPStatus.found)
+            return response.headers["Location"];
+
         enforce!HTTPAPIException(
             status >= 200 && status < 300,
             format("Expected status code 2xx, got %s", response.statusCode)
         );
+
+        return null;
     }
 }
