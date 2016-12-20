@@ -161,12 +161,14 @@ struct HTTPConnection
 
         Params:
             url = GitHub API method URL (relative)
+            accept = optional argument with custom `Accept` header to
+                specify for this one request
 
         Returns:
             Json body of the response. If response is multi-page, all pages
             are collected and concatenated into one returned json object.
      **/
-    Json get ( string url )
+    Json get ( string url, string accept = "" )
     {
         assert (this.connection !is null);
 
@@ -190,7 +192,7 @@ struct HTTPConnection
                 (scope request) {
                     request.requestURL = url;
                     request.method = HTTPMethod.GET;
-                    this.prepareRequest(request);
+                    this.prepareRequest(request, accept);
                 }
             );
 
@@ -296,7 +298,8 @@ struct HTTPConnection
         return response.readJson();
     }
 
-    private void prepareRequest ( scope HTTPClientRequest request )
+    private void prepareRequest ( scope HTTPClientRequest request,
+        string accept = "" )
     {
         import vibe.http.auth.basic_auth : addBasicAuth;
 
@@ -305,7 +308,10 @@ struct HTTPConnection
         else
             request.headers["Authorization"] = this.config.oauthToken;
 
-        request.headers["Accept"] = this.config.accept;
+        if (accept.length)
+            request.headers["Accept"] = accept;
+        else
+            request.headers["Accept"] = this.config.accept;
     }
 
     private void handleResponseStatus ( scope HTTPClientResponse response )
