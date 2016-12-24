@@ -199,10 +199,12 @@ struct HTTPConnection
                 }
             );
 
+            scope(exit)
+                response.dropBody();
+
             if (auto location = this.handleResponseStatus(response))
             {
                 url = location;
-                response.dropBody();
                 continue;
             }
 
@@ -285,9 +287,11 @@ struct HTTPConnection
             }
         );
 
+        scope(exit)
+            response.dropBody();
+
         if (auto location = this.handleResponseStatus(response))
         {
-            response.dropBody();
             return this.post(location, json);
         }
 
@@ -322,9 +326,11 @@ struct HTTPConnection
             }
         );
 
+        scope(exit)
+            response.dropBody();
+
         if (auto location = this.handleResponseStatus(response))
         {
-            response.dropBody();
             return this.patch(location, json);
         }
 
