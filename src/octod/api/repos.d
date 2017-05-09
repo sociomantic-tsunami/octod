@@ -335,14 +335,14 @@ struct RepositoryEntity
     Returns:
         Wrapper struct to work with that repo embedding the json metadata
  **/
-Repository repository ( HTTPConnection connection, string repo )
+Repository repository ( ref HTTPConnection connection, string repo )
 {
     import std.format;
 
     validateRepoString(repo);
 
     return Repository(
-        connection,
+        &connection,
         connection.get(format("/repos/%s", repo))
     );
 }
@@ -359,7 +359,7 @@ Repository repository ( HTTPConnection connection, string repo )
     Returns:
         Array of json objects one per each repo
  **/
-Repository[] listOrganizationRepos ( HTTPConnection connection, string name,
+Repository[] listOrganizationRepos ( ref HTTPConnection connection, string name,
     string type = "sources" )
 {
     import std.format;
@@ -377,6 +377,6 @@ Repository[] listOrganizationRepos ( HTTPConnection connection, string name,
 
     return json
         .get!(Json[])
-        .map!(elem => Repository(connection, elem))
+        .map!(elem => Repository(&connection, elem))
         .array();
 }

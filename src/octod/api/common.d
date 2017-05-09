@@ -66,9 +66,9 @@ mixin template CommonEntityMethods ( )
 
     private
     {
-        HTTPConnection connection;
+        HTTPConnection* connection;
 
-        this ( HTTPConnection connection, const Json json )
+        this ( HTTPConnection* connection, const Json json )
         {
             this.json = json;
             this.connection = connection;

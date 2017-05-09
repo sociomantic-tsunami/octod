@@ -66,9 +66,7 @@ struct HTTPConnection
     private
     {
         alias Connection = typeof(connectHTTP(null, 0, false));
-
-        static assert (is(Connection == struct));
-        Connection* connection;
+        Connection connection;
 
         Configuration config;
     }
@@ -153,8 +151,7 @@ struct HTTPConnection
                 throw new HTTPAPIException("Protocol not supported: " ~ match[1]);
         }
 
-        this.connection = new Connection;
-        *this.connection = connectHTTP(addr, port, tls);
+        this.connection = connectHTTP(addr, port, tls);
 
         logTrace("Connected.");
     }

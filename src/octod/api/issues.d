@@ -69,7 +69,7 @@ struct Issue
     Returns:
         created issue
  **/
-Issue createIssue ( HTTPConnection connection, string repo, string title,
+Issue createIssue ( ref HTTPConnection connection, string repo, string title,
     string text, Json base = Json.emptyObject )
 {
     validateRepoString(repo);
@@ -78,7 +78,7 @@ Issue createIssue ( HTTPConnection connection, string repo, string title,
     base["body"]  = text;
 
     return Issue(
-        connection,
+        &connection,
         connection.post("/repos/" ~ repo ~ "/issues", base)
     );
 }
@@ -94,7 +94,7 @@ Issue createIssue ( HTTPConnection connection, string repo, string title,
         modificiations = json object with fields to modify, must comply to
             https://developer.github.com/v3/issues/#edit-an-issue
  **/
-void modifyIssue ( HTTPConnection connection, string repo, long number,
+void modifyIssue ( ref HTTPConnection connection, string repo, long number,
     Json modifications )
 {
     import std.format;
@@ -114,13 +114,13 @@ void modifyIssue ( HTTPConnection connection, string repo, long number,
             "sociomantic-tsunami/ocean"
         number = issue number to fetch
  **/
-Issue getIssue ( HTTPConnection connection, string repo, long number )
+Issue getIssue ( ref HTTPConnection connection, string repo, long number )
 {
     import std.format;
 
     validateRepoString(repo);
 
-    return Issue(connection,
+    return Issue(&connection,
         connection.get(format("/repos/%s/issues/%s", repo, number)));
 }
 
@@ -132,7 +132,7 @@ Issue getIssue ( HTTPConnection connection, string repo, long number )
         repo = repository string of form "owner/repo", for example
             "sociomantic-tsunami/ocean"
  **/
-Issue[] listIssues ( HTTPConnection connection, string repo )
+Issue[] listIssues ( ref HTTPConnection connection, string repo )
 {
     import std.format;
     import std.algorithm.iteration : map;
@@ -143,6 +143,6 @@ Issue[] listIssues ( HTTPConnection connection, string repo )
     return connection
         .get(format("/repos/%s/issues", repo))
         .get!(Json[])
-        .map!(element => Issue(connection, element))
+        .map!(element => Issue(&connection, element))
         .array();
 }
