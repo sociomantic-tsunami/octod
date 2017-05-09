@@ -42,7 +42,7 @@ enum ProjectMediaType = "application/vnd.github.inertia-preview+json";
     Returns:
         Array of project wrapper structs
  **/
-Project[] listOrganizationProjects ( HTTPConnection connection, string organization )
+Project[] listOrganizationProjects ( ref HTTPConnection connection, string organization )
 {
     import std.algorithm : map;
     import std.array : array;
@@ -52,7 +52,7 @@ Project[] listOrganizationProjects ( HTTPConnection connection, string organizat
     auto json = connection.get(url, ProjectMediaType);
     return json
         .get!(Json[])
-        .map!(json => Project(connection, json))
+        .map!(json => Project(&connection, json))
         .array();
 }
 
@@ -72,7 +72,7 @@ Project[] listOrganizationProjects ( HTTPConnection connection, string organizat
     Returns:
         wrapper struct for created project
  **/
-Project createOrganizationProject ( HTTPConnection connection,
+Project createOrganizationProject ( ref HTTPConnection connection,
     string organization, string name, string text = "" )
 {
     import std.format;
@@ -86,7 +86,7 @@ Project createOrganizationProject ( HTTPConnection connection,
         ])
     );
 
-    return Project(connection, json);
+    return Project(&connection, json);
 }
 
 /**
@@ -237,7 +237,7 @@ struct Column
     {
         import octod.api.issues : getIssue;
 
-        auto issue_id = this.connection.getIssue(repo, number).id();
+        auto issue_id = (*this.connection).getIssue(repo, number).id();
         return this.addCard(issue_id);
     }
 
