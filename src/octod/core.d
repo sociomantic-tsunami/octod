@@ -262,11 +262,12 @@ struct HTTPConnection
         Params:
             url = GitHub API method URL (relative)
             json = request body to send
+            accept = optional, request media type
 
         Returns:
             Json body of the response.
      **/
-    Json post ( string url, Json json )
+    Json post ( string url, Json json, MediaType accept )
     {
         assert (this.connection !is null);
 
@@ -279,7 +280,7 @@ struct HTTPConnection
             (scope request) {
                 request.requestURL = url;
                 request.method = HTTPMethod.POST;
-                this.prepareRequest(request);
+                this.prepareRequest(request, accept.toString());
                 request.writeJsonBody(json);
             }
         );
@@ -296,16 +297,26 @@ struct HTTPConnection
     }
 
     /**
+        ditto
+     **/
+    Json post ( string url, Json json, string accept = "")
+    {
+        return this.post(url, json, accept.length
+            ? MediaType.parse(accept) : MediaType.Default);
+    }
+
+    /**
         Sends PATCH request to API server
 
         Params:
             url = GitHub API method URL (relative)
             json = request body to send
+            accept = optional, request media type
 
         Returns:
             Json body of the response.
      **/
-    Json patch ( string url, Json json )
+    Json patch ( string url, Json json, MediaType accept )
     {
         assert (this.connection !is null);
 
@@ -318,7 +329,7 @@ struct HTTPConnection
             (scope request) {
                 request.requestURL = url;
                 request.method = HTTPMethod.PATCH;
-                this.prepareRequest(request);
+                this.prepareRequest(request, accept.toString());
                 request.writeJsonBody(json);
             }
         );
@@ -332,6 +343,15 @@ struct HTTPConnection
         }
 
         return response.readJson();
+    }
+
+    /**
+        ditto
+     **/
+    Json patch ( string url, Json json, string accept = "")
+    {
+        return this.post(url, json, accept.length
+            ? MediaType.parse(accept) : MediaType.Default);
     }
 
     /**

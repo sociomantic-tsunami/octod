@@ -83,7 +83,8 @@ Project createOrganizationProject ( ref HTTPConnection connection,
         Json([
             "name" : Json(name),
             "body" : Json(text)
-        ])
+        ]),
+        ProjectMediaType
     );
 
     return Project(&connection, json);
@@ -165,7 +166,11 @@ struct Project
         import std.format;
 
         auto url = format("/projects/%s/columns", this.id());
-        auto json = connection.post(url, Json([ "name" : Json(name) ]));
+        auto json = connection.post(
+            url,
+            Json([ "name" : Json(name) ]),
+            ProjectMediaType
+        );
 
         return Column(connection, json);
     }
@@ -264,7 +269,8 @@ struct Column
                 Json([
                     "content_type" : Json("Issue"),
                     "content_id"   : Json(issue)
-                ])
+                ]),
+                ProjectMediaType
             )
         );
     }
