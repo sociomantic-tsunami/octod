@@ -382,7 +382,8 @@ struct HTTPConnection
 
         enforce!HTTPAPIException(
             status >= 200 && status < 300,
-            format("Expected status code 2xx, got %s", response.statusCode)
+            format("Expected status code 2xx, got %s\n\n%s\n",
+                response.statusCode, response.readJson())
         );
 
         return null;
