@@ -17,17 +17,20 @@ import octod.media;
 import octod.api.common;
 
 /**
-    Aggregate for git tag description
+    Aggregate for git reference description
 
-    There are quite some places in GitHub JSON responses where tags are
+    There are quite some places in GitHub JSON responses where references are
     referred either by name or by sha exclusively. This API tries to provide
     both when feasible and wraps it with this struct.
  **/
-struct Tag
+struct GitRef
 {
     string name;
     string sha;
 }
+
+/// Alias for old name of the struct
+deprecated alias Tag = GitRef;
 
 /**
     Wraps connection and repository metadata for simple shortcut access
@@ -78,6 +81,35 @@ struct Repository
     }
 
     /**
+        Fetches all repository branches
+
+        Returns:
+            array of gitref structs for all GitHub branches in this repo
+     **/
+    GitRef[] branches ( )
+    {
+        import std.format;
+        import std.algorithm;
+        import std.range;
+
+        import vibe.data.json;
+
+        auto owner = this.json["owner"]["login"].get!string();
+        auto name = this.name();
+
+        auto url = format("/repos/%s/%s/branches", owner, name);
+        auto json_branches = this.connection.get(url).get!(Json[]);
+
+        GitRef toRef ( Json branch )
+        {
+           return GitRef(branch["name"].get!string,
+                       branch["commit"]["sha"].to!string);
+        }
+
+        return json_branches.map!toRef.array;
+    }
+
+    /**
         Fetches repository tags filtered to only released ones
 
         This utility is useful for projects that strictly require all public
@@ -89,9 +121,9 @@ struct Repository
         method makes request to both and merges information into one entity.
 
         Returns:
-            array of tag structs for all GitHub releases in this repo
+            array of gitref structs for all GitHub releases in this repo
      **/
-    Tag[] releasedTags ( )
+    GitRef[] releasedTags ( )
     {
         import std.format;
         import std.array;
@@ -107,13 +139,13 @@ struct Repository
         url = format("/repos/%s/%s/tags", owner, name);
         auto json_tags = this.connection.get(url).get!(Json[]);
 
-        Tag resolveTag ( Json release )
+        GitRef resolveTag ( Json release )
         {
             auto tag_name = release["tag_name"].get!string();
             auto tag = json_tags
                 .find!(json => json["name"].get!string() == tag_name);
             assert (!tag.empty);
-            return Tag(tag_name, tag.front["commit"]["sha"].to!string());
+            return GitRef(tag_name, tag.front["commit"]["sha"].to!string());
         }
 
         return json_releases
