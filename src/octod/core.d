@@ -33,8 +33,8 @@ struct Configuration
     string password;
     /// If 'this.username' is empty, will be used as auth token
     string oauthToken;
-    /// By default client works in dry run mode
-    bool dryRun = true;
+    /// By default client works in live mode
+    bool dryRun = false;
 }
 
 /**
