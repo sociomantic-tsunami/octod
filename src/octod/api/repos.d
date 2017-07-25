@@ -127,7 +127,7 @@ struct Repository
     {
         import std.format;
         import std.array;
-        import std.algorithm.iteration : map;
+        import std.algorithm.iteration : map, filter;
         import std.algorithm.searching : find;
 
         auto owner = this.json["owner"]["login"].get!string();
@@ -149,6 +149,7 @@ struct Repository
         }
 
         return json_releases
+            .filter!(a=>!a["draft"].get!bool)
             .map!resolveTag
             .array();
     }
