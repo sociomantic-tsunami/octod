@@ -16,6 +16,14 @@ import vibe.data.json;
 import octod.core;
 import octod.api.common;
 
+/// Possible states of an issue
+enum IssueState
+{
+    Open = "open",
+    Closed = "closed",
+    All = "all",
+}
+
 /**
     Wraps connection and issue metadata for simple shortcut access
     to repository related API methods. Arbitrary fields can be accessed
@@ -131,8 +139,10 @@ Issue getIssue ( ref HTTPConnection connection, string repo, long number )
         connection = setup connection to API server
         repo = repository string of form "owner/repo", for example
             "sociomantic-tsunami/ocean"
+        state = only fetch issues with this state
  **/
-Issue[] listIssues ( ref HTTPConnection connection, string repo )
+Issue[] listIssues ( ref HTTPConnection connection, string repo,
+    IssueState state = IssueState.Open )
 {
     import std.format;
     import std.algorithm.iteration : map;
@@ -141,7 +151,7 @@ Issue[] listIssues ( ref HTTPConnection connection, string repo )
     validateRepoString(repo);
 
     return connection
-        .get(format("/repos/%s/issues", repo))
+        .get(format("/repos/%s/issues?state=%s", repo, cast(string) state))
         .get!(Json[])
         .map!(element => Issue(&connection, element))
         .array();
