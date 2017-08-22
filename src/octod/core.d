@@ -125,11 +125,11 @@ struct HTTPConnection
 
         logTrace("Connecting to GitHub API server ...");
 
-        static rgxURL = regex(r"^(\w*)://([^/]+)$");
+        static rgxURL = regex(r"^(\w*)://([^/:]+)(:[^/]+)?$");
         auto match = this.config.baseURL.matchFirst(rgxURL);
 
         enforce!HTTPAPIException(
-            match.length == 3,
+            match.length >= 3,
             "Malformed API base URL in configuration: " ~ this.config.baseURL
         );
 
@@ -137,18 +137,27 @@ struct HTTPConnection
         ushort port;
         bool   tls;
 
-        switch (match[1])
+        if (match.length == 4)
         {
-            case "http":
-                port = 80;
-                tls = false;
-                break;
-            case "https":
-                port = 443;
-                tls = true;
-                break;
-            default:
-                throw new HTTPAPIException("Protocol not supported: " ~ match[1]);
+            import std.conv : to;
+            port = to!ushort(match[3][1..$]);
+            tls  = (match[1] == "https");
+        }
+        else
+        {
+            switch (match[1])
+            {
+                case "http":
+                    port = 80;
+                    tls = false;
+                    break;
+                case "https":
+                    port = 443;
+                    tls = true;
+                    break;
+                default:
+                    throw new HTTPAPIException("Protocol not supported: " ~ match[1]);
+            }
         }
 
         this.connection = connectHTTP(addr, port, tls);
