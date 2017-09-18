@@ -137,7 +137,7 @@ struct HTTPConnection
         ushort port;
         bool   tls;
 
-        if (match.length == 4)
+        if (match.length == 4 && match[3].length > 0)
         {
             import std.conv : to;
             port = to!ushort(match[3][1..$]);
