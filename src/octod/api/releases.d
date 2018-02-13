@@ -14,6 +14,8 @@ module octod.api.releases;
 import octod.api.repos;
 import octod.core;
 
+import std.typecons;
+
 /*******************************************************************************
 
     Creates a new release on github
@@ -24,11 +26,13 @@ import octod.core;
         tag  = tag used for the release
         title = title for the release
         content = content of the release
+        prerelease = true if this is a prerelease, else false
 
 *******************************************************************************/
 
 public void createRelease ( ref HTTPConnection connection, ref Repository repo,
-                            string tag, string title, string content )
+    string tag, string title, string content,
+    Flag!"prerelease" prerelease = No.prerelease )
 {
     import std.format;
     import vibe.data.json;
@@ -41,6 +45,7 @@ public void createRelease ( ref HTTPConnection connection, ref Repository repo,
     json["name"] = title;
     json["body"] = content;
     json["target_committish"] = tag;
+    json["prerelease"] = prerelease == Yes.prerelease;
 
     auto url = format("/repos/%s/%s/releases", owner, name);
 
