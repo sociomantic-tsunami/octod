@@ -359,7 +359,7 @@ struct HTTPConnection
      **/
     Json patch ( string url, Json json, string accept = "")
     {
-        return this.post(url, json, accept.length
+        return this.patch(url, json, accept.length
             ? MediaType.parse(accept) : MediaType.Default);
     }
 
