@@ -26,6 +26,7 @@ module octod.media;
 enum ProtocolVersion
 {
     V3 = "v3",
+    JeanGreyPreview = "jean-grey-preview",
 }
 
 /**
@@ -37,6 +38,9 @@ struct MediaType
 {
     /// Media type used by default if none is specified by user of the library
     enum Default = MediaType.init;
+    /// Media type that is basically v3 with a v4 extra attribute "node_id"
+    enum JeanGreyPreview =
+        MediaType(true, ProtocolVersion.JeanGreyPreview, "", MediaFormat.JSON);
 
     immutable
     {
@@ -117,6 +121,8 @@ struct MediaType
             == "application/vnd.github.v2+xml");
         assert(MediaType.init.toString()
             == "application/vnd.github.v3+json");
+        assert(MediaType.JeanGreyPreview.toString()
+            == "application/vnd.github.jean-grey-preview+json");
     }
 
     /**
