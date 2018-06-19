@@ -144,13 +144,17 @@ struct Repository
             auto tag_name = release["tag_name"].get!string();
             auto tag = json_tags
                 .find!(json => json["name"].get!string() == tag_name);
-            assert (!tag.empty);
-            return GitRef(tag_name, tag.front["commit"]["sha"].to!string());
+            if (tag.empty)
+                return GitRef.init;
+            else
+                return GitRef(tag_name, tag.front["commit"]["sha"].to!string());
         }
 
         return json_releases
-            .filter!(a=>!a["draft"].get!bool)
+            .filter!(a => !a["draft"].get!bool)
             .map!resolveTag
+            // refs that failed to resolve will have empty name:
+            .filter!(gitref => gitref.name.length)
             .array();
     }
 
