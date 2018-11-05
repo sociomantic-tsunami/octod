@@ -1,3 +1,11 @@
+Disclaimer
+==========
+
+This project is now archived/abandoned as it was always used only by one
+application ([neptune](https://github.com/sociomantic-tsunami/neptune)), and
+the code was moved to it. This project is only kept for historical reasons, but
+if you want to reuse the code you should probably check out neptune.
+
 Description
 ===========
 
