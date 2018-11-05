@@ -3,7 +3,7 @@
     Code shared between higher level GitHub API wrappers, mostly related
     to error handling.
 
-    Copyright: Copyright (c) 2016 Sociomantic Labs GmbH. All rights reserved
+    Copyright: Copyright (c) 2016 dunnhumby Germany GmbH. All rights reserved
 
     License: Boost Software License Version 1.0 (see LICENSE for details)
 

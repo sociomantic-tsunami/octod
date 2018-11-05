@@ -8,7 +8,7 @@
     modules - functions return wrapper objects providing further nested
     methods instead of raw json.
 
-    Copyright: Copyright (c) 2016 Sociomantic Labs GmbH. All rights reserved
+    Copyright: Copyright (c) 2016 dunnhumby Germany GmbH. All rights reserved
 
     License: Boost Software License Version 1.0 (see LICENSE for details)
 

@@ -3,7 +3,7 @@
     Provides wrappers on top of some methods documented in
     https://developer.github.com/v3/oauth_authorizations/
 
-    Copyright: Copyright (c) 2016 sociomantic labs GmbH. All rights reserved
+    Copyright: Copyright (c) 2016 dunnhumby Germany GmbH. All rights reserved
 
     License: Boost Software License Version 1.0 (see LICENSE for details)
 

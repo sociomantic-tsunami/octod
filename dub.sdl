@@ -1,7 +1,7 @@
 name "octod"
 description "D library for interacting with GitHub API"
 authors "Mihails Strasuns"
-copyright "Copyright 2016, Sociomantic Labs"
+copyright "Copyright 2016, dunnhumby Germany GmbH"
 license "Boost"
 
 targetType "sourceLibrary"

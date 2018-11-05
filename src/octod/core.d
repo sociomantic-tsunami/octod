@@ -4,7 +4,7 @@
     basic get/post/patch methods taking care of API details internally (like
     auth or multi-page responses).
 
-    Copyright: Copyright (c) 2016 Sociomantic Labs GmbH. All rights reserved
+    Copyright: Copyright (c) 2016 dunnhumby Germany GmbH. All rights reserved
 
     License: Boost Software License Version 1.0 (see LICENSE for details)
 
