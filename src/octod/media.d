@@ -3,7 +3,7 @@
     Wraps media type string used for interaction with GitHub as defined
     by https://developer.github.com/v3/media
 
-    Copyright: Copyright (c) 2016 Sociomantic Labs GmbH. All rights reserved
+    Copyright: Copyright (c) 2016 dunnhumby Germany GmbH. All rights reserved
 
     License: Boost Software License Version 1.0 (see LICENSE for details)
 

@@ -3,7 +3,7 @@
 name "example"
 description "Script that fetched various information about content of the repo"
 authors "Mihails Strasuns"
-copyright "Copyright 2016, Sociomantic Labs"
+copyright "Copyright 2016, dunnhumby Germany GmbH"
 license "Boost"
 
 targetType "executable"
